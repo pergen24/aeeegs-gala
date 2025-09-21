@@ -6,8 +6,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
 #        'postgresql://pergentino:098765@db:5432/gala'
-         'postgresql+psycopg2://neondb_owner:npg_OZt6YRgW7ASF@ep-dry-meadow-adyj4mki-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
-
+#         'postgresql+psycopg2://neondb_owner:npg_OZt6YRgW7ASF@ep-dry-meadow-adyj4mki-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+        'postgresql+psycopg2://neondb_owner:npg_mUPGMj0O5eyq@ep-green-boat-adjdm91u-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
     )
 
     # Carpeta para subir recibos
