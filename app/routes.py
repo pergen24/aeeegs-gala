@@ -93,26 +93,57 @@ def checkout(ticket_type):
 
     return render_template('cliente/checkout.html', ticket_type=ticket_type)
 
+#@bp.route('/subir_recibo/<int:purchase_id>', methods=['GET', 'POST'])
+#def subir_recibo(purchase_id):
+#    purchase = TicketPurchase.query.get_or_404(purchase_id)
+#    if request.method == 'POST':
+#        if 'receipt' not in request.files:
+#            flash('No file part')
+#            return redirect(request.url)
+#        file = request.files['receipt']
+#        if file and allowed_file(file.filename):
+#            filename = secure_filename(f"{purchase.id}_{file.filename}")
+#            save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+#            file.save(save_path)
+#            purchase.receipt_filename = filename
+#            purchase.status = 'uploaded'
+#            db.session.commit()
+#            return redirect(url_for('.gracias'))
+#        else:
+#            flash('Archivo no permitido')
+#            return redirect(request.url)
+#    return render_template('cliente/subir_recibo.html', purchase=purchase)
+
 @bp.route('/subir_recibo/<int:purchase_id>', methods=['GET', 'POST'])
 def subir_recibo(purchase_id):
     purchase = TicketPurchase.query.get_or_404(purchase_id)
+
     if request.method == 'POST':
-        if 'receipt' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['receipt']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(f"{purchase.id}_{file.filename}")
-            save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            file.save(save_path)
-            purchase.receipt_filename = filename
+        files = []
+        for field in ['receipt1', 'receipt2']:
+            file = request.files.get(field)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(f"{purchase.id}_{field}_{file.filename}")
+                save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                file.save(save_path)
+                files.append(filename)
+            elif file:
+                flash(f"Archivo {field} no permitido")
+                return redirect(request.url)
+
+        # Guardar los nombres en la base de datos
+        if files:
+            purchase.receipt_filename1 = files[0] if len(files) > 0 else None
+            purchase.receipt_filename2 = files[1] if len(files) > 1 else None
             purchase.status = 'uploaded'
             db.session.commit()
             return redirect(url_for('.gracias'))
         else:
-            flash('Archivo no permitido')
+            flash("Debes subir al menos un recibo")
             return redirect(request.url)
+
     return render_template('cliente/subir_recibo.html', purchase=purchase)
+
 
 @bp.route('/gracias')
 def gracias():
@@ -190,3 +221,62 @@ def admin_approve(purchase_id):
 
     return redirect(url_for("main.admin_index"))
 
+
+
+
+
+
+
+#@bp.route('/admin/suspend/<int:purchase_id>', methods=['POST'])
+#@admin_required
+#def admin_suspend(purchase_id):
+#    purchase = TicketPurchase.query.get_or_404(purchase_id)#
+
+#    try:
+        # Eliminar recibos del servidor si existen
+#        for receipt in [purchase.receipt_filename1, purchase.receipt_filename2]:
+#            if receipt:
+#                file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], receipt)
+#                if os.path.exists(file_path):
+#                    os.remove(file_path)
+
+        # Si ya tenía un PDF generado, también lo borramos
+#        if purchase.pdf_filename:
+#            tickets_folder = current_app.config.get('GENERATED_TICKETS_FOLDER', '/app/generated_tickets')
+#            pdf_path = os.path.join(tickets_folder, purchase.pdf_filename)
+#            if os.path.exists(pdf_path):
+#                os.remove(pdf_path)
+
+        # Eliminar el registro de la compra
+#        db.session.delete(purchase)
+#        db.session.commit()
+
+#        flash(f"Compra #{purchase.id} suspendida y eliminada del sistema.", "warning")
+
+#    except Exception as e:
+#        flash(f"Error al suspender la compra: {str(e)}", "danger")
+
+#    return redirect(url_for("main.admin_index"))
+
+@bp.route('/admin/suspend/<int:purchase_id>', methods=['POST'])
+@admin_required
+def admin_suspend(purchase_id):
+    purchase = TicketPurchase.query.get_or_404(purchase_id)
+
+    # Borrar recibos físicos del servidor si existen
+    for field in ["receipt_filename1", "receipt_filename2"]:
+        filename = getattr(purchase, field, None)
+        if filename:
+            file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    current_app.logger.warning(f"No se pudo borrar {file_path}: {e}")
+
+    # Eliminar la compra de la base de datos
+    db.session.delete(purchase)
+    db.session.commit()
+
+    flash(f"El recibo #{purchase.id} fue suspendido y eliminado correctamente.", "danger")
+    return redirect(url_for("main.admin_index"))
