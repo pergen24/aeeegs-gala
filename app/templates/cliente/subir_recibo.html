@@ -35,14 +35,23 @@
 
           <!-- Formulario de subida -->
           <form method="post" enctype="multipart/form-data">
+            <!-- Recibo 1 -->
             <div class="mb-3">
-              <label for="receipt" class="form-label fw-bold">Selecciona tu recibo:</label>
-              <input class="form-control" type="file" id="receipt" name="receipt" accept=".png,.jpg,.jpeg,.pdf" required>
+              <label for="receipt1" class="form-label fw-bold">Selecciona tu recibo principal:</label>
+              <input class="form-control" type="file" id="receipt1" name="receipt1" accept=".png,.jpg,.jpeg,.pdf" required>
               <div class="form-text">Formatos aceptados: PNG, JPG, JPEG, PDF.</div>
             </div>
+
+            <!-- Recibo 2 -->
+            <div class="mb-3">
+              <label for="receipt2" class="form-label fw-bold">Selecciona tu segundo recibo (opcional):</label>
+              <input class="form-control" type="file" id="receipt2" name="receipt2" accept=".png,.jpg,.jpeg,.pdf">
+              <div class="form-text">Opcional, solo si deseas subir un segundo archivo.</div>
+            </div>
+
             <div class="d-grid">
               <button type="submit" class="btn btn-success btn-lg shadow-sm">
-                Subir Recibo
+                Subir Recibos
               </button>
             </div>
           </form>
@@ -52,7 +61,7 @@
 
       <!-- Nota adicional -->
       <div class="alert alert-info mt-4 text-center shadow-sm" role="alert">
-        <i class="bi bi-info-circle-fill"></i> Una vez subido el recibo, tu pago será verificado automáticamente.
+        <i class="bi bi-info-circle-fill"></i> Una vez subidos los recibos, tu pago será verificado automáticamente.
       </div>
 
     </div>
