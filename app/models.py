@@ -14,7 +14,8 @@ class TicketPurchase(db.Model):
     city = db.Column(db.String(100))
     phone = db.Column(db.String(50))
     status = db.Column(db.String(20), default='pending')  # pending, uploaded, approved
-    receipt_filename = db.Column(db.String(255))  # path to uploaded receipt
+    receipt_filename1 = db.Column(db.String(255))  # path to uploaded receipt
+    receipt_filename2 = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -28,7 +29,9 @@ class TicketPurchase(db.Model):
             "city": self.city,
             "phone": self.phone,
             "status": self.status,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
+            "receipt_filename1": self.receipt_filename1,
+            "receipt_filename2": self.receipt_filename2
         }
 
 
@@ -46,20 +49,3 @@ class Admin(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-
-
-
-
-
-#class Admin(db.Model):
-#    __tablename__ = 'admins'
-#    id = db.Column(db.Integer, primary_key=True)
-#    username = db.Column(db.String(50), unique=True, nullable=False)
-#    password_hash = db.Column(db.String(512), nullable=False)
-
-#    def set_password(self, password):
-#        self.password_hash = generate_password_hash(password)
-
-#    def check_password(self, password):
-#        return check_password_hash(self.password_hash, password)
